@@ -19,10 +19,24 @@ public class Player {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Map<Game, Integer> getPlayedTime() {
+        return playedTime;
+    }
+
+    public void setPlayedTime(Map<Game, Integer> playedTime) {
+        this.playedTime = playedTime;
+    }
+
     /** добавление игры игроку
      если игра уже была, никаких изменений происходить не должно */
     public void installGame(Game game) {
-        playedTime.put(game, 0);
+        if (!playedTime.containsKey(game)) {
+            playedTime.put(game, 0);
+        }
     }
 
     /** игрок играет в игру game на протяжении hours часов
@@ -32,10 +46,12 @@ public class Player {
      если игра не была установлена, то надо выкидывать RuntimeException */
     public int play(Game game, int hours) {
         game.getStore().addPlayTime(name, hours);
-        if (playedTime.containsKey(game)) {
-            playedTime.put(game, playedTime.get(game));
+        if (hours <= 0) {
+            throw new RuntimeException("Время не может быть отрицательным");
+        } else if (playedTime.containsKey(game)) {
+            playedTime.put(game, playedTime.get(game) + hours);
         } else {
-            playedTime.put(game, hours);
+            throw new RuntimeException("У игрока " + this.name + " игра " + game + " не установлена!");
         }
         return playedTime.get(game);
     }
@@ -57,6 +73,17 @@ public class Player {
     /** Метод принимает жанр и возвращает игру этого жанра, в которую играли больше всего
      Если в игры этого жанра не играли, возвращается null */
     public Game mostPlayerByGenre(String genre) {
+        int max = 0;
+        for (Game game : playedTime.keySet()) {
+            if (game.getGenre().equals(genre) && playedTime.get(game) > max) {
+                max = playedTime.get(game);
+            }
+        }
+        for (Game game : playedTime.keySet()) {
+            if (max == playedTime.get(game)) {
+                return game;
+            }
+        }
         return null;
     }
 }
