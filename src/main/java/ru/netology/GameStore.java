@@ -45,7 +45,7 @@ public class GameStore {
      */
     public void addPlayTime(String playerName, int hours) {
         if (playedTime.containsKey(playerName)) {
-            playedTime.put(playerName, playedTime.get(playerName));
+            playedTime.put(playerName, playedTime.getOrDefault(playerName, hours) + hours);
         } else {
             playedTime.put(playerName, hours);
         }
